@@ -1,22 +1,24 @@
 package raytracer.cucumber.glue.matrix
 
-import io.cucumber.java8.En
-import io.cucumber.java8.PendingException
+import raytracer.cucumber.glue.BaseSteps
+import raytracer.math.Matrix
+import kotlin.test.assertEquals
 
-class MatricesStepDefs : En {
+class MatricesStepDefs : BaseSteps {
+    lateinit var matrix: Matrix
+
     init {
-        Then("M[{int}, {int}] = {double}") { row: Int, col: Int, expected: Double ->
-//            assertEquals(matrix2[row, col], expected)
+
+        Given("the following 4x4 matrix M:") { m: Matrix ->
+            assertEquals(m.array.size, 4)
+            matrix = m
         }
 
-        /*
-        Given("b ← tuple\\({int}, {int}, {int}, {int})", (Integer int1, Integer int2, Integer int3, Integer int4) -> {
-         // Write code here that turns the phrase above into concrete actions
-            throw new io.cucumber.java8.PendingException();
-        });
-         */
-        Given("b ← tuple\\({int}, {int}, {int}, {int})") { int1: Int, int2: Int?, int3: Int?, int4: Int? ->
-            throw PendingException()
+        Then("M\\[{int}, {int}] = {float}") { row: Int, col: Int, expected: Float ->
+            assertEquals(matrix[row, col], expected)
         }
     }
 }
+
+
+

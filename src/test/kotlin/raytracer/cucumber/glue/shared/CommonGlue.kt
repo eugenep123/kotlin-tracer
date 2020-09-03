@@ -1,15 +1,17 @@
 package raytracer.cucumber.glue.shared
 
+import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import raytracer.films.Canvas
-import raytracer.math.Color
 import raytracer.math.*
 import kotlin.math.sqrt
+import kotlin.test.assertEquals
 
-fun toDouble(s: String?): Double = when (s?.trim()) {
-    "√2/2" -> sqrt(2.0) / 2.0
-    else -> java.lang.Double.parseDouble(s)
-}
+fun toFloat(s: String?): Float =
+    when (s?.trim()) {
+        "√2/2" -> sqrt(2.0f) / 2.0f
+        else -> java.lang.Float.parseFloat(s!!.trim())
+    }
 
 fun toInt(s: String?): Int = java.lang.Integer.parseInt(s!!.trim())
 
@@ -17,27 +19,48 @@ class CommonGlue : En {
     init {
 
         ParameterType("vector", "vector\\((.+),(.+),(.+)\\)") { x: String?, y: String?, z: String? ->
-            Vector(toDouble(x), toDouble(y), toDouble(z))
+            Vector(toFloat(x), toFloat(y), toFloat(z))
         }
 
         ParameterType("point", "point\\((.+),(.+),(.+)\\)") { x: String?, y: String?, z: String? ->
-            Point(toDouble(x), toDouble(y), toDouble(z))
+            Point(toFloat(x), toFloat(y), toFloat(z))
         }
 
         ParameterType(
             "color",
-            "([a-z]+])|color\\((.+),(.+),(.+)\\)"
+            "([A-Za-z]+)|color\\((.+),(.+),(.+)\\)"
         ) { name: String?, r: String?, g: String?, b: String? ->
-            name?.toColor() ?: Color(toDouble(r), toDouble(g), toDouble(b))
+            name?.toColor() ?: Color(toFloat(r), toFloat(g), toFloat(b))
         }
 
         ParameterType("canvas", "canvas\\((.+),(.+)\\)") { width: String?, height: String? ->
             Canvas(toInt(width), toInt(height))
         }
 
-        // Sqrt of some double
-        ParameterType("sqrt", "√(.+)") { d: String? ->
-            sqrt(toDouble(d))
+        // Sqrt of some Float
+        ParameterType("sqrt", "√(.+)") { s: String? ->
+            sqrt(toFloat(s))
         }
+
+        DataTableType<Matrix> { dt: DataTable? -> dt!!.toMatrix }
+
     }
+
+
 }
+
+// Convert a dataTable to a Matrix
+val DataTable.toMatrix: Matrix
+    get()  {
+        assertEquals(height(), 4)
+        assertEquals(width(), 4)
+
+        val array = Array<FloatArray>(4) { y ->
+            FloatArray(4) { x ->
+                val value = cell(y, x)
+                toFloat(value)
+            }
+        }
+        return Matrix(array)
+    }
+

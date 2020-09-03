@@ -1,2 +1,3 @@
 # kotlin-tracer
-ray tracer challenge while learning Kotlin
+
+Implementing the [Ray Tracer Challenge](http://raytracerchallenge.com/) while learning Kotlin

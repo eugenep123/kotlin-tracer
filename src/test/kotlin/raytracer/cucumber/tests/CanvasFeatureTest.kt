@@ -9,6 +9,6 @@ import org.junit.runner.RunWith
     features = ["classpath:features/canvas.feature"],
     tags = "not @Wip",
     glue = ["classpath:raytracer.cucumber.glue.canvas", "classpath:raytracer.cucumber.glue.shared"],
-    plugin = ["pretty", "html:target/cucumber/html"],
+    plugin = ["pretty", "html:target/cucumber/html"]
 )
 class CanvasFeatureTest

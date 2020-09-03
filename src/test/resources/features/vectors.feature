@@ -130,6 +130,11 @@ Feature: Tuples, Vectors, and Points
     And c2 ← color(0.7, 0.1, 0.25)
     Then c1 + c2 = color(1.6, 0.7, 1.0)
 
+  Scenario: Adding 2 named colors
+    Given c1 ← red
+    And c2 ← green
+    Then c1 + c2 = color(1.0, 1.0, 0.0)
+
   Scenario: Subtracting colors
     Given c1 ← color(0.9, 0.6, 0.75)
     And c2 ← color(0.7, 0.1, 0.25)

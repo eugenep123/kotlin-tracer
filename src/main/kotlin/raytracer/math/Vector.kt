@@ -2,18 +2,18 @@ package raytracer.math
 
 import kotlin.math.sqrt
 
-data class Vector(val x: Double, val y: Double, val z: Double) {
+data class Vector(val x: Float, val y: Float, val z: Float) {
 
     val normalize: Vector
         get() = this / magnitude
 
-    val magnitude: Double get() = sqrt(x * x + y * y + z * z)
+    val magnitude: Float get() = sqrt(x * x + y * y + z * z)
 
     inline operator fun plus(rhs: Vector) = Vector(x + rhs.x, y + rhs.y, z + rhs.z)
     inline operator fun minus(rhs: Vector): Vector = Vector(x - rhs.x, y - rhs.y, z - rhs.z)
     inline operator fun unaryMinus(): Vector = Vector(-x, -y, -z)
-    operator fun times(d: Double): Vector  = Vector(x * d, y * d, z * d)
-    operator fun div(scalar: Double): Vector = Vector(x / scalar, y / scalar, z / scalar)
+    operator fun times(scalar: Float): Vector  = Vector(x * scalar, y * scalar, z * scalar)
+    operator fun div(scalar: Float): Vector = Vector(x / scalar, y / scalar, z / scalar)
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -23,7 +23,7 @@ data class Vector(val x: Double, val y: Double, val z: Double) {
     }
 }
 
-inline fun dot(a: Vector, b: Vector): Double {
+inline fun dot(a: Vector, b: Vector): Float {
     return a.x * b.x + a.y * b.y + a.z * b.z
 }
 inline fun cross(a: Vector, b: Vector): Vector {
@@ -33,7 +33,7 @@ inline fun cross(a: Vector, b: Vector): Vector {
 inline fun reflect(i: Vector, n: Vector): Vector =
     i - 2.0f * dot(n, i) * n
 
-inline operator fun Double.times(v: Vector) =
+inline operator fun Float.times(v: Vector) =
     Vector(this * v.x, this * v.y, this * v.z)
 
 
