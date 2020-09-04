@@ -7,6 +7,7 @@ data class Transform(val matrix: Matrix, val inverseMatrix: Matrix) {
 
     inline operator fun invoke(v: Vector): Vector = matrix * v
     inline operator fun invoke(p: Point): Point = matrix * p
+    inline operator fun invoke(r: Ray): Ray = r(matrix)
 
     inline operator fun times(t: Transform): Transform =
         Transform(matrix * t.matrix, inverseMatrix * t.inverseMatrix)

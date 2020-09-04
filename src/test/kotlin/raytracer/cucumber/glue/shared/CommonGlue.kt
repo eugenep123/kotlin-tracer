@@ -102,6 +102,15 @@ class CommonGlue : En {
             )
         }
 
+        // Ray
+        ParameterType("ray", "ray\\(point\\($REAL, $REAL, $REAL\\), vector\\($REAL, $REAL, $REAL\\)\\)") {
+                px: String?, py: String?, pz: String?,
+                vx: String?, vy: String?, vz: String? ->
+//                origin: Point?, direction: Vector? ->
+            val origin = Point(toNumber(px), toNumber(py), toNumber(pz))
+            val direction = Vector(toNumber(vx), toNumber(vy), toNumber(vz))
+            Ray(origin, direction)
+        }
 
 
     }

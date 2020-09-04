@@ -39,5 +39,12 @@ class ManualTest {
         assertEquals(-0.7071067811865475, toNumber("-√2/2"), EPSILON)
     }
 
-
+    @Test
+    fun test_ray_scaling() {
+        val r = Ray(Point(1.0, 2.0, 3.0), Vector(0.0, 1.0, 0.0))
+        val m = Transform.scale(2.0, 3.0, 4.0)
+        val r2 = m(r) //transform(r, m)
+        assertEquals(r2.origin, Point(2.0, 6.0, 12.0))
+        assertEquals(r2.direction, Vector(0.0, 3.0, 0.0))
+    }
 }
