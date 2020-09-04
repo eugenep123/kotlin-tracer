@@ -61,7 +61,6 @@ class VectorsStepDefs : BaseSteps {
         Then("v / {real} = {vector}") { f: Float, vector: Vector -> assertEquals(v / f, vector) }
         Then("p / {real} = {point}") { f: Float, point: Point -> assertEquals(p / f, point) }
 
-//        Then("v.magnitude = {real}") { f: Float -> assertEquals(v.magnitude, f) }
         Then("v.magnitude = {real}") { f: Float -> assertEquals(v.magnitude, f) }
         Then("v.normalize = {vector}") { vector: Vector -> assertEquals(v.normalize, vector) }
         Then("v.normalize = approximately {vector}") { vector: Vector -> assertEquals(v.normalize, vector) }
