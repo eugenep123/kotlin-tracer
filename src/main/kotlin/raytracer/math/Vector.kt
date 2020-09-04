@@ -1,5 +1,6 @@
 package raytracer.math
 
+import java.util.zip.DeflaterOutputStream
 import kotlin.math.sqrt
 
 data class Vector(val x: Double, val y: Double, val z: Double) {
@@ -21,6 +22,10 @@ data class Vector(val x: Double, val y: Double, val z: Double) {
         other as Vector
         return (x eq other.x) &&  (y eq other.y) && (z eq other.z)
     }
+
+    inline fun cross(other: Vector): Vector = cross(this, other)
+
+    inline fun dot(other: Vector): Double = dot(this, other)
 }
 
 inline fun dot(a: Vector, b: Vector): Double {

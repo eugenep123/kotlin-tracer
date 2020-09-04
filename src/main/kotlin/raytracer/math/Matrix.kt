@@ -1,5 +1,8 @@
 package raytracer.math
 
+import kotlin.math.cos
+import kotlin.math.sin
+
 
 // Array based matrix
 typealias Matrix = Matrix4
@@ -163,11 +166,32 @@ data class Matrix4(
         other as Matrix4
         return (
                 (m00 eq other.m00) && (m01 eq other.m01) && (m02 eq other.m02) && (m03 eq other.m03) &&
-                (m10 eq other.m10) && (m11 eq other.m11) && (m12 eq other.m12) && (m13 eq other.m13) &&
-                (m20 eq other.m20) && (m21 eq other.m21) && (m22 eq other.m22) && (m23 eq other.m23) &&
-                (m30 eq other.m30) && (m31 eq other.m31) && (m32 eq other.m32) && (m33 eq other.m33)
-            )
+                        (m10 eq other.m10) && (m11 eq other.m11) && (m12 eq other.m12) && (m13 eq other.m13) &&
+                        (m20 eq other.m20) && (m21 eq other.m21) && (m22 eq other.m22) && (m23 eq other.m23) &&
+                        (m30 eq other.m30) && (m31 eq other.m31) && (m32 eq other.m32) && (m33 eq other.m33)
+                )
     }
+
+    override fun hashCode(): Int {
+        var result = m00.hashCode()
+        result = 31 * result + m01.hashCode()
+        result = 31 * result + m02.hashCode()
+        result = 31 * result + m03.hashCode()
+        result = 31 * result + m10.hashCode()
+        result = 31 * result + m11.hashCode()
+        result = 31 * result + m12.hashCode()
+        result = 31 * result + m13.hashCode()
+        result = 31 * result + m20.hashCode()
+        result = 31 * result + m21.hashCode()
+        result = 31 * result + m22.hashCode()
+        result = 31 * result + m23.hashCode()
+        result = 31 * result + m30.hashCode()
+        result = 31 * result + m31.hashCode()
+        result = 31 * result + m32.hashCode()
+        result = 31 * result + m33.hashCode()
+        return result
+    }
+
     companion object {
         fun of(a: Array<DoubleArray>) =
             Matrix4(
@@ -190,5 +214,67 @@ data class Matrix4(
 
 }
 
+fun Matrix4.Companion.translate(dx: Double, dy: Double, dz: Double): Matrix =
+    Matrix(
+        1.0, 0.0, 0.0, dx,
+        0.0, 1.0, 0.0, dy,
+        0.0, 0.0, 1.0, dz,
+        0.0, 0.0, 0.0, 1.0
+    )
 
+fun Matrix4.Companion.scale(sx: Double, sy: Double, sz: Double): Matrix =
+    Matrix(
+        sx, 0.0, 0.0, 0.0,
+        0.0, sy, 0.0, 0.0,
+        0.0, 0.0, sz, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    )
 
+fun Matrix4.Companion.rotateX(r: Radians): Matrix =
+    Matrix(
+        1.0, 0.0, 0.0, 0.0,
+        0.0, cos(r), -sin(r), 0.0,
+        0.0, sin(r), cos(r), 0.0,
+        0.0, 0.0, 0.0, 1.0
+    )
+
+fun Matrix4.Companion.rotateY(r: Radians): Matrix =
+    Matrix(
+        cos(r), 0.0, sin(r), 0.0,
+        0.0, 1.0, 0.0, 0.0,
+        -sin(r), 0.0, cos(r), 0.0,
+        0.0, 0.0, 0.0, 1.0
+    )
+
+fun Matrix4.Companion.rotateZ(r: Radians): Matrix =
+    Matrix(
+        cos(r), -sin(r), 0.0, 0.0,
+        sin(r), cos(r), 0.0, 0.0,
+        0.0, 0.0, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    )
+
+fun Matrix4.Companion.shearing(
+    xy: Double, xz: Double,
+    yx: Double, yz: Double,
+    zx: Double, zy: Double): Matrix =
+    Matrix(
+        1.0, xy, xz, 0.0,
+        yx, 1.0, yz, 0.0,
+        zx, zy, 1.0, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    )
+
+fun Matrix4.Companion.view(from: Point, to: Point, up: Vector): Matrix {
+    val forward = (to - from).normalize
+    val upn = up.normalize
+    val left = forward.cross(upn)
+    val trueUp = left.cross(forward)
+    val orientation = Matrix(
+        left.x, left.y, left.z, 0.0,
+        trueUp.x, trueUp.y, trueUp.z, 0.0,
+        -forward.x, -forward.y, -forward.z, 0.0,
+        0.0, 0.0, 0.0, 1.0
+    )
+    return orientation * Matrix.translate(-from.x, -from.y, -from.z)
+}

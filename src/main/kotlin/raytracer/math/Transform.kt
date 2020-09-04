@@ -1,8 +1,5 @@
 package raytracer.math
 
-import kotlin.math.cos
-import kotlin.math.sin
-
 
 data class Transform(val matrix: Matrix, val inverseMatrix: Matrix) {
 
@@ -11,47 +8,46 @@ data class Transform(val matrix: Matrix, val inverseMatrix: Matrix) {
     inline operator fun invoke(v: Vector): Vector = matrix * v
     inline operator fun invoke(p: Point): Point = matrix * p
 
+    inline operator fun times(t: Transform): Transform =
+        Transform(matrix * t.matrix, inverseMatrix * t.inverseMatrix)
+
     companion object {
+        fun of(m: Matrix): Transform? = m.inverse?.let { Transform(m, it) }
         val Identity = Transform(Matrix.Identity, Matrix.Identity)
 
         fun translate(v: Vector): Transform = translate(v.x, v.y, v.z)
         fun translate(dx: Double, dy: Double, dz: Double): Transform =
-            Transform(translateMatrix(dx, dy, dz), translateMatrix(-dx, -dy, -dz))
+            Transform(Matrix.translate(dx, dy, dz), Matrix.translate(-dx, -dy, -dz))
 
         fun scale(sv: Vector): Transform = scale(sv.x, sv.y, sv.z)
         fun scale(sx: Double, sy: Double, sz: Double): Transform =
             Transform(
-                scaleMatrix(sx, sy, sz),
-                scaleMatrix(1.0 / sx, 1.0 / sy, 1.0 / sz)
+                Matrix.scale(sx, sy, sz),
+                Matrix.scale(1.0 / sx, 1.0 / sy, 1.0 / sz)
             )
 
         fun rotationX(r: Radians): Transform =
-            Transform(rotateXMatrix(r), rotateXMatrix(-r))
+            Transform(Matrix.rotateX(r), Matrix.rotateX(-r))
 
+        fun rotationY(r: Radians): Transform =
+            Transform(Matrix.rotateY(r), Matrix.rotateY(-r))
 
+        fun rotationZ(r: Radians): Transform =
+            Transform(Matrix.rotateZ(r), Matrix.rotateZ(-r))
+
+        fun shearing(
+            xy: Double, xz: Double,
+            yx: Double, yz: Double,
+            zx: Double, zy: Double
+        ): Transform =
+            Transform(
+                Matrix.shearing(xy, xz, yx, yz, zx, zy),
+                Matrix.shearing(1.0 / xy, 1.0 / xz, 1.0 / yx, 1.0 / yz, 1.0 / zx, 1.0 / zy)
+            )
+
+        fun view(from: Point, to: Point, up: Vector): Transform? =
+            Transform.of(Matrix.view(from, to, up))
     }
+
 }
 
-fun translateMatrix(dx: Double, dy: Double, dz: Double): Matrix =
-    Matrix(
-        1.0, 0.0, 0.0, dx,
-        0.0, 1.0, 0.0, dy,
-        0.0, 0.0, 1.0, dz,
-        0.0, 0.0, 1.0, 1.0
-    )
-
-fun rotateXMatrix(r: Radians): Matrix =
-    Matrix(
-        1.0, 0.0, 0.0, 0.0,
-        0.0, cos(r), -sin(r), 0.0,
-        0.0, sin(r), cos(r), 0.0,
-        0.0, 0.0, 0.0, 1.0
-    )
-
-fun scaleMatrix(sx: Double, sy: Double, sz: Double): Matrix =
-    Matrix(
-        sx, 0.0, 0.0, 0.0,
-        0.0, sy, 0.0, 0.0,
-        0.0, 0.0, sz, 0.0,
-        0.0, 0.0, 0.0, 1.0
-    )
