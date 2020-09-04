@@ -27,8 +27,6 @@ fun toFloat(sn: String?): Float {
 }
 
 
-
-
 fun toInt(s: String?): Int = Integer.parseInt(s!!.trim())
 /*
  * Common issues:
