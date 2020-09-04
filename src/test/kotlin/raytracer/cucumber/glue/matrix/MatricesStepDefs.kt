@@ -27,10 +27,10 @@ class MatricesStepDefs : BaseSteps {
         Given("the following 4x4 matrix B:") { m: Matrix -> B = is4x4(m) }
 
         // Issue: "M[0,0]" is picked up as "M[{double}], so convert it to "M[0, 0]" (with space)
-        Then("M[{index}, {index}] = {real}") { row: Int, col: Int, expected: Float ->
+        Then("M[{index}, {index}] = {real}") { row: Int, col: Int, expected: Double ->
             assertEquals(matrix[row, col], expected)
         }
-        Then("B[{index}, {index}] = {real}") { row: Int, col: Int, expected: Float ->
+        Then("B[{index}, {index}] = {real}") { row: Int, col: Int, expected: Double ->
             assertEquals(B!![row, col], expected)
         }
         Then("A = B") { assertEquals(A, B) }
@@ -52,7 +52,7 @@ class MatricesStepDefs : BaseSteps {
         Then("A ← transpose\\({identity})") { id: Matrix -> A = id.transpose }
         Then("A = {identity}") { id: Matrix -> assertEquals(A, id) }
 
-        Then("determinant\\(A) = {real}") { expected: Float -> assertEquals(A.determinant, expected) }
+        Then("determinant\\(A) = {real}") { expected: Double -> assertEquals(A.determinant, expected) }
         Then("A is invertible") { assertTrue(A.isInvertible) }
         Then("A is not invertible") { assertFalse(A.isInvertible) }
 

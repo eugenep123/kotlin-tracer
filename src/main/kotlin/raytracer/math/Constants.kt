@@ -2,14 +2,14 @@ package raytracer.math
 
 import kotlin.math.abs
 
-const val PI            = 3.1415926536f
-const val EPSILON       = 0.00001f
-const val EPSILON_TEST  = 0.0001f
+const val PI            = 3.1415926536
+const val EPSILON       = 0.00001
+const val EPSILON_TEST  = 0.0001
 
-inline infix fun Float.eq(rhs: Float): Boolean =
+inline infix fun Double.eq(rhs: Double): Boolean =
     abs(this - rhs) <= EPSILON
 
-inline infix fun Float.neq(rhs: Float): Boolean =
+inline infix fun Double.neq(rhs: Double): Boolean =
     abs(this - rhs) > EPSILON
 
-typealias Radians = Float
+typealias Radians = Double

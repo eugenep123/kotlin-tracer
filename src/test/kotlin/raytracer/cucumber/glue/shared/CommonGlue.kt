@@ -4,25 +4,25 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import raytracer.films.Canvas
 import raytracer.math.*
-import java.lang.Float.parseFloat
+import java.lang.Double.parseDouble
 import kotlin.math.sqrt
 import kotlin.test.assertEquals
 
-fun toFloat(sn: String?): Float {
+fun toNumber(sn: String?): Double {
     val s = sn!!
     return when {
-        s.startsWith(" ") -> toFloat(s.trim())
+        s.startsWith(" ") -> toNumber(s.trim())
         s.contains("/") -> {
             val index = s.indexOf('/')
-            val dividend = toFloat(s.substring(0, index))
-            val divisor = toFloat(s.drop(index + 1))
+            val dividend = toNumber(s.substring(0, index))
+            val divisor = toNumber(s.drop(index + 1))
             dividend / divisor
         }
-        s.startsWith("-√") -> - sqrt(toFloat(s.drop(1)))
-        s.startsWith("√") -> sqrt(toFloat(s.drop(1)))
+        s.startsWith("-√") -> -sqrt(toNumber(s.drop(2)))
+        s.startsWith("√") -> sqrt(toNumber(s.drop(1)))
         s == "π" -> PI
         s == "-π" -> -PI
-        else -> parseFloat(s.trim())
+        else -> parseDouble(s.trim())
     }
 }
 
@@ -36,27 +36,27 @@ class CommonGlue : En {
     init {
 
 
-        // Capture all possible float expression characters and parse it later
+        // Capture all possible numeric expression characters and parse it later
         val REAL = "\\s*([0-9\\.\\-\\+√\\/π]+)\\s*"
 
         // Weird numbers like: √14 and √2/2
         ParameterType("real", "($REAL)") { s: String? ->
-            toFloat(s)
+            toNumber(s)
         }
 
         ParameterType("vector", "vector\\($REAL, $REAL, $REAL\\)") { x: String?, y: String?, z: String? ->
-            Vector(toFloat(x), toFloat(y), toFloat(z))
+            Vector(toNumber(x), toNumber(y), toNumber(z))
         }
 
         ParameterType("point", "point\\($REAL, $REAL, $REAL\\)") { x: String?, y: String?, z: String? ->
-            Point(toFloat(x), toFloat(y), toFloat(z))
+            Point(toNumber(x), toNumber(y), toNumber(z))
         }
 
         ParameterType(
             "color",
             "(red|green|blue|white|black)|color\\($REAL, $REAL, $REAL\\)"
         ) { name: String?, r: String?, g: String?, b: String? ->
-            name?.toColor() ?: Color(toFloat(r), toFloat(g), toFloat(b))
+            name?.toColor() ?: Color(toNumber(r), toNumber(g), toNumber(b))
         }
 
         ParameterType("canvas", "canvas\\(([0-9]+),\\s*([0-9]+)\\)") { width: String?, height: String? ->
@@ -73,14 +73,14 @@ class CommonGlue : En {
 
         // Transforms
         ParameterType("translation", "translation\\($REAL, $REAL, $REAL\\)") { x: String?, y: String?, z: String? ->
-            Transform.translate(toFloat(x), toFloat(y), toFloat(z))
+            Transform.translate(toNumber(x), toNumber(y), toNumber(z))
         }
         ParameterType("scaling", "scaling\\($REAL, $REAL, $REAL\\)") { x: String?, y: String?, z: String? ->
-            Transform.scale(toFloat(x), toFloat(y), toFloat(z))
+            Transform.scale(toNumber(x), toNumber(y), toNumber(z))
         }
 
         ParameterType("rotation_x", "rotation_x\\($REAL\\)") { r: String? ->
-            Transform.rotationX(toFloat(r))
+            Transform.rotationX(toNumber(r))
         }
     }
 }
@@ -90,10 +90,10 @@ val DataTable.toMatrix: Matrix
     get()  {
         val size = width()
         assertEquals(width(), height())
-        val array = Array<FloatArray>(size) { y ->
-            FloatArray(size) { x ->
+        val array = Array<DoubleArray>(size) { y ->
+            DoubleArray(size) { x ->
                 val value = cell(y, x)
-                toFloat(value)
+                toNumber(value)
             }
         }
         return Matrix.of(array)
