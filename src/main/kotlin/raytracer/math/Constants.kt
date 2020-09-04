@@ -12,3 +12,4 @@ inline infix fun Float.eq(rhs: Float): Boolean =
 inline infix fun Float.neq(rhs: Float): Boolean =
     abs(this - rhs) > EPSILON
 
+typealias Radians = Float

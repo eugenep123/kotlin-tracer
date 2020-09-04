@@ -4,27 +4,42 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import raytracer.films.Canvas
 import raytracer.math.*
+import java.lang.Float.parseFloat
 import kotlin.math.sqrt
 import kotlin.test.assertEquals
 
-// TODO: add proper parser
-fun toFloat(s: String?): Float =
-    when (s?.trim()) {
-        "√14" -> sqrt(14.0f)
-        "√2/2" -> sqrt(2.0f) / 2.0f
-        "-160/532" -> -160f/532f
-        "105/532" -> 105f/532f
-        else -> java.lang.Float.parseFloat(s!!.trim())
+fun toFloat(sn: String?): Float {
+    val s = sn!!
+    return when {
+        s.startsWith(" ") -> toFloat(s.trim())
+        s.contains("/") -> {
+            val index = s.indexOf('/')
+            val dividend = toFloat(s.substring(0, index))
+            val divisor = toFloat(s.drop(index + 1))
+            dividend / divisor
+        }
+        s.startsWith("-√") -> - sqrt(toFloat(s.drop(1)))
+        s.startsWith("√") -> sqrt(toFloat(s.drop(1)))
+        s == "π" -> PI
+        s == "-π" -> -PI
+        else -> parseFloat(s.trim())
     }
+}
 
-fun toInt(s: String?): Int = java.lang.Integer.parseInt(s!!.trim())
 
+
+
+fun toInt(s: String?): Int = Integer.parseInt(s!!.trim())
+/*
+ * Common issues:
+ *  - "π / 4" does not parse, make it: "π/4
+ */
 class CommonGlue : En {
     init {
 
-        val FLOAT = "[-+]?\\d+(?:\\.\\d+)?"
-        val REAL = "([√]?$FLOAT(?:\\/[√]?$FLOAT)?)"
 
+        // Capture all possible float expression characters and parse it later
+        val REAL = "\\s*([0-9\\.\\-\\+√\\/π]+)\\s*"
 
         // Weird numbers like: √14 and √2/2
         ParameterType("real", "($REAL)") { s: String? ->
@@ -52,11 +67,23 @@ class CommonGlue : En {
 
         DataTableType<Matrix> { dt: DataTable? -> dt!!.toMatrix }
 
-        ParameterType("index", "([0-3]+)") { index: String? ->
+        ParameterType("index", "([0-3]+)") { index: String ->
             Integer.parseInt(index)
         }
 
         ParameterType("identity", "(identity_matrix)") { _ -> Matrix.Identity }
+
+        // Transforms
+        ParameterType("translation", "translation\\($REAL, $REAL, $REAL\\)") { x: String?, y: String?, z: String? ->
+            Transform.translate(toFloat(x), toFloat(y), toFloat(z))
+        }
+        ParameterType("scaling", "scaling\\($REAL, $REAL, $REAL\\)") { x: String?, y: String?, z: String? ->
+            Transform.scale(toFloat(x), toFloat(y), toFloat(z))
+        }
+
+        ParameterType("rotation_x", "rotation_x\\($REAL\\)") { r: String? ->
+            Transform.rotationX(toFloat(r))
+        }
     }
 }
 
