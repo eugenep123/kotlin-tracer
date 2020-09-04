@@ -7,10 +7,13 @@ import raytracer.math.*
 import kotlin.math.sqrt
 import kotlin.test.assertEquals
 
+// TODO: add proper parser
 fun toFloat(s: String?): Float =
     when (s?.trim()) {
         "√14" -> sqrt(14.0f)
         "√2/2" -> sqrt(2.0f) / 2.0f
+        "-160/532" -> -160f/532f
+        "105/532" -> 105f/532f
         else -> java.lang.Float.parseFloat(s!!.trim())
     }
 

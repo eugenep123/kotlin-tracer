@@ -18,24 +18,6 @@ data class Matrix4(
     val columns: Int
         get() = 4
 
-    companion object {
-        fun of(a: Array<FloatArray>) =
-            Matrix4(
-                a[0][0], a[0][1], a[0][2], a[0][3],
-                a[1][0], a[1][1], a[1][2], a[1][3],
-                a[2][0], a[2][1], a[2][2], a[2][3],
-                a[3][0], a[3][1], a[3][2], a[3][3]
-            )
-
-        fun from(f: (Int, Int) -> Float): Matrix4 =
-            Matrix4(
-                f(0, 0), f(0, 1), f(0, 2), f(0, 3),
-                f(1, 0), f(1, 1), f(1, 2), f(1, 3),
-                f(2, 0), f(2, 1), f(2, 2), f(2, 3),
-                f(3, 0), f(3, 1), f(3, 2), f(3, 3)
-            )
-        val Identity: Matrix4 = from { x, y -> if (x == y) 1.0f else 0.0f }
-    }
     inline operator fun get(row: Int, col: Int): Float = when(row) {
         0 -> when(col) {
             0 -> m00
@@ -68,7 +50,103 @@ data class Matrix4(
         else -> throw IllegalArgumentException("row must be in 0..3")
     }
 
+    val determinant: Float
+        get() = inversePair.first
+
+    val isInvertible: Boolean
+        get() = determinant != 0.0f
+
+    val inverse: Matrix?
+        get() = inversePair.second
+
+    // Calculate the determinant and inverse pair
+    private val inversePair: Pair<Float, Matrix?> by lazy { calculateInverse() }
+
+    private fun calculateInverse(): Pair<Float, Matrix4?>  {
+        val A2323 = m22 * m33 - m23 * m32
+        val A1323 = m21 * m33 - m23 * m31
+        val A1223 = m21 * m32 - m22 * m31
+        val A0323 = m20 * m33 - m23 * m30
+        val A0223 = m20 * m32 - m22 * m30
+        val A0123 = m20 * m31 - m21 * m30
+        val det =
+            (m00 * ( m11 * A2323 - m12 * A1323 + m13 * A1223 )) -
+            (m01 * ( m10 * A2323 - m12 * A0323 + m13 * A0223 )) +
+            (m02 * ( m10 * A1323 - m11 * A0323 + m13 * A0123 )) -
+            (m03 * ( m10 * A1223 - m11 * A0223 + m12 * A0123 ))
+
+        return when(det) {
+            0.0f -> Pair(det, null)
+            else -> {
+                val A2313 = m12 * m33 - m13 * m32
+                val A1313 = m11 * m33 - m13 * m31
+                val A1213 = m11 * m32 - m12 * m31
+                val A2312 = m12 * m23 - m13 * m22
+                val A1312 = m11 * m23 - m13 * m21
+                val A1212 = m11 * m22 - m12 * m21
+                val A0313 = m10 * m33 - m13 * m30
+                val A0213 = m10 * m32 - m12 * m30
+                val A0312 = m10 * m23 - m13 * m20
+                val A0212 = m10 * m22 - m12 * m20
+                val A0113 = m10 * m31 - m11 * m30
+                val A0112 = m10 * m21 - m11 * m20
+                val invDet = 1.0f / det
+                val inv = Matrix(
+                    invDet *   ( m11 * A2323 - m12 * A1323 + m13 * A1223 ),
+                    invDet * - ( m01 * A2323 - m02 * A1323 + m03 * A1223 ),
+                    invDet *   ( m01 * A2313 - m02 * A1313 + m03 * A1213 ),
+                    invDet * - ( m01 * A2312 - m02 * A1312 + m03 * A1212 ),
+                    invDet * - ( m10 * A2323 - m12 * A0323 + m13 * A0223 ),
+                    invDet *   ( m00 * A2323 - m02 * A0323 + m03 * A0223 ),
+                    invDet * - ( m00 * A2313 - m02 * A0313 + m03 * A0213 ),
+                    invDet *   ( m00 * A2312 - m02 * A0312 + m03 * A0212 ),
+                    invDet *   ( m10 * A1323 - m11 * A0323 + m13 * A0123 ),
+                    invDet * - ( m00 * A1323 - m01 * A0323 + m03 * A0123 ),
+                    invDet *   ( m00 * A1313 - m01 * A0313 + m03 * A0113 ),
+                    invDet * - ( m00 * A1312 - m01 * A0312 + m03 * A0112 ),
+                    invDet * - ( m10 * A1223 - m11 * A0223 + m12 * A0123 ),
+                    invDet *   ( m00 * A1223 - m01 * A0223 + m02 * A0123 ),
+                    invDet * - ( m00 * A1213 - m01 * A0213 + m02 * A0113 ),
+                    invDet *   ( m00 * A1212 - m01 * A0212 + m02 * A0112 )
+                )
+                Pair(det, inv)
+            }
+        }
+    }
+
+    companion object {
+        fun of(a: Array<FloatArray>) =
+            Matrix4(
+                a[0][0], a[0][1], a[0][2], a[0][3],
+                a[1][0], a[1][1], a[1][2], a[1][3],
+                a[2][0], a[2][1], a[2][2], a[2][3],
+                a[3][0], a[3][1], a[3][2], a[3][3]
+            )
+
+        fun from(f: (Int, Int) -> Float): Matrix4 =
+            Matrix4(
+                f(0, 0), f(0, 1), f(0, 2), f(0, 3),
+                f(1, 0), f(1, 1), f(1, 2), f(1, 3),
+                f(2, 0), f(2, 1), f(2, 2), f(2, 3),
+                f(3, 0), f(3, 1), f(3, 2), f(3, 3)
+            )
+        val Identity: Matrix4 = from { x, y -> if (x == y) 1.0f else 0.0f }
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as Matrix4
+        return (
+            (m00 eq other.m00) && (m01 eq other.m01) && (m02 eq other.m02) && (m03 eq other.m03) &&
+            (m10 eq other.m10) && (m11 eq other.m11) && (m12 eq other.m12) && (m13 eq other.m13) &&
+            (m20 eq other.m20) && (m21 eq other.m21) && (m22 eq other.m22) && (m23 eq other.m23) &&
+            (m30 eq other.m30) && (m31 eq other.m31) && (m32 eq other.m32) && (m33 eq other.m33)
+        )
+    }
 }
+
+
 
 inline operator fun Matrix4.times(other: Matrix4): Matrix4 =
     Matrix4(
@@ -102,29 +180,12 @@ inline operator fun Matrix4.times(rhs: Vector): Vector =
         m20 * rhs.x + m21 * rhs.y + m22 * rhs.z
     )
 
-//data class Matrix(val array: Array<FloatArray>) {
-//    operator fun get(row: Int, col: Int): Float = array[row][col]
-//
-//    val rows: Int
-//        get() = array.size
-//
-//    override fun equals(other: Any?): Boolean {
-//        if (this === other) return true
-//        if (javaClass != other?.javaClass) return false
-//        other as Matrix
-//        if (!array.contentDeepEquals(other.array)) return false
-//        return true
-//    }
-//
-//    override fun hashCode(): Int {
-//        return array.contentDeepHashCode()
-//    }
-//
-//
-//    companion object {
-//        fun of(array: Array<FloatArray>) {
-//
-//        }
-//    }
-//
-//}
+inline val Matrix4.transpose: Matrix
+    get() =
+        Matrix(
+            m00, m10, m20, m30,
+            m01, m11, m21, m31,
+            m02, m12, m22, m32,
+            m03, m13, m23, m33
+        )
+
