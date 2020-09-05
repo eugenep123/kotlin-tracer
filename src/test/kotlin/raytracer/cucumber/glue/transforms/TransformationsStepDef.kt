@@ -1,6 +1,5 @@
 package raytracer.cucumber.glue.transforms
 
-
 import raytracer.cucumber.glue.BaseSteps
 import raytracer.math.Matrix
 import raytracer.math.Point

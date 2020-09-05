@@ -105,8 +105,8 @@ Scenario: Computing the normal on a translated sphere
 
 Scenario: Computing the normal on a transformed sphere
   Given s ← sphere()
-    And m ← scaling(1, 0.5, 1) * rotation_z(π/5)
-    And set_transform(s, m)
+    And t ← scaling(1, 0.5, 1) * rotation_z(π/5)
+    And set_transform(s, t)
   When n ← normal_at(s, point(0, √2/2, -√2/2))
   Then n = vector(0, 0.97014, -0.24254)
 

@@ -1,6 +1,5 @@
 package raytracer.cucumber.glue.rays
 
-import io.cucumber.java8.PendingException
 import raytracer.cucumber.glue.BaseSteps
 import raytracer.math.Point
 import raytracer.math.Ray

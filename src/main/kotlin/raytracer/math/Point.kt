@@ -15,6 +15,10 @@ data class Point(val x: Double, val y: Double, val z: Double) {
         other as Point
         return (x eq other.x) &&  (y eq other.y) && (z eq other.z)
     }
+
+    companion object {
+        val origin = Point(0.0, 0.0, 0.0)
+    }
 }
 
 inline operator fun Vector.plus(rhs: Point): Point = rhs + this

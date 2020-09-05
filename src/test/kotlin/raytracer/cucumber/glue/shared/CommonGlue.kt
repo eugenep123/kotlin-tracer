@@ -4,6 +4,8 @@ import io.cucumber.datatable.DataTable
 import io.cucumber.java8.En
 import raytracer.films.Canvas
 import raytracer.math.*
+import raytracer.shapes.Shape
+import raytracer.shapes.Sphere
 import java.lang.Double.parseDouble
 import kotlin.math.sqrt
 import kotlin.test.assertEquals
@@ -106,12 +108,18 @@ class CommonGlue : En {
         ParameterType("ray", "ray\\(point\\($REAL, $REAL, $REAL\\), vector\\($REAL, $REAL, $REAL\\)\\)") {
                 px: String?, py: String?, pz: String?,
                 vx: String?, vy: String?, vz: String? ->
-//                origin: Point?, direction: Vector? ->
             val origin = Point(toNumber(px), toNumber(py), toNumber(pz))
             val direction = Vector(toNumber(vx), toNumber(vy), toNumber(vz))
             Ray(origin, direction)
         }
 
+        // shapes
+        ParameterType<Shape>("shape", "(sphere)\\(\\)") { name: String? ->
+            when (name!!) {
+                "sphere" -> Sphere()
+                else -> fail("Invalid shape: $name")
+            }
+        }
 
     }
 }
