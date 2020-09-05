@@ -31,7 +31,7 @@ fun renderShape(shape: Shape) {
 
     for (y in 0 .. canvasPixels) {
         for (x in 0 .. canvasPixels) {
-// compute the world x coordinate (left = -half, right = half)
+            // compute the world x coordinate (left = -half, right = half)
             val worldX = -half + pixelSize * x
             // compute the world y coordinate (top = +half, bottom = -half)
             val worldY = half - pixelSize * y
@@ -47,7 +47,6 @@ fun renderShape(shape: Shape) {
     }
 
     canvas.writeToFolder("chapter5")
-
 
 }
 

@@ -1,7 +1,6 @@
 package raytracer.utils
 
 import raytracer.films.Canvas
-import java.io.BufferedWriter
 import java.io.File
 import java.nio.file.Paths
 
